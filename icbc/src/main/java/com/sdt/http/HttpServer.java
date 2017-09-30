@@ -23,7 +23,7 @@ import io.netty.handler.codec.http.HttpServerCodec;
  * @author liuqiang
  *
  */
-public class HttpServer {
+public class HttpServer implements Runnable{
 	private static final Logger logger = LoggerFactory.getLogger(HttpServer.class);
 	
 	private final int port;
@@ -31,7 +31,7 @@ public class HttpServer {
 		this.port = port;
 	}
 	
-	public void run() throws InterruptedException {
+	public void run() {
 		EventLoopGroup bossGroup = new NioEventLoopGroup(1);
 		EventLoopGroup workerGroup = new NioEventLoopGroup();
 		
@@ -55,7 +55,11 @@ public class HttpServer {
 			logger.info("Netty-http server listening on port " + port);
 			
 			future.channel().closeFuture().sync();
-		}finally{
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally{
 			bossGroup.shutdownGracefully();
 			workerGroup.shutdownGracefully();
 		}
