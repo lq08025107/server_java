@@ -8,6 +8,7 @@ package com.sdt.http;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Map.Entry;
 
 import org.apache.commons.codec.CharEncoding;
@@ -16,6 +17,8 @@ import org.apache.http.impl.io.ContentLengthInputStream;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.sdt.logic.LogicModule;
+import com.sdt.queue.LogicQueue;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -55,7 +58,11 @@ public class HttpServerhandler extends ChannelInboundHandlerAdapter {
     private static final String ERROR = "error";
     private static final String CONNECTION_KEEP_ALIVE = "keep-alive";
     private static final String CONNECTION_CLOSE = "close";
-    
+    private Queue<String> processQueue = null;
+    public HttpServerhandler() {
+		LogicQueue logicQueue = new LogicQueue();
+    	processQueue = logicQueue.processQueue;
+	}
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
         ctx.flush();
@@ -137,6 +144,9 @@ public class HttpServerhandler extends ChannelInboundHandlerAdapter {
                 fullRequest.content().readBytes(content);  
                 String contentStr = new String(content, "UTF-8");  
                 System.out.println(contentStr);
+                
+                processQueue.offer(contentStr);
+                System.out.println("put into queue");
                 //json解析到底在哪里合适
                 JSONObject obj = JSON.parseObject(contentStr);
     			for(Entry<String, Object> item : obj.entrySet()){

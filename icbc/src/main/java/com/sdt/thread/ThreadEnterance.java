@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 import javax.swing.plaf.basic.BasicTabbedPaneUI.TabSelectionHandler;
 
 import com.sdt.http.HttpServer;
+import com.sdt.logic.LogicModule;
 
 import ch.qos.logback.core.joran.event.StartEvent;
 
@@ -21,9 +22,10 @@ public class ThreadEnterance {
 	public void start(){
 		ExecutorService executor = Executors.newCachedThreadPool();
 		HttpServer httpServer = new HttpServer(8080);
-		Task task = new Task();
+		//Task task = new Task();
+		LogicModule logicModule = new LogicModule();
 		executor.execute(httpServer);
-		executor.execute(task);
+		executor.execute(logicModule);
 	}
 	public static void main(String[] args){
 		new ThreadEnterance().start();
@@ -41,9 +43,7 @@ class Task implements Runnable{
 				e.printStackTrace();
 			}
 		}
-			
-		
-		
+
 	}
 	
 }
