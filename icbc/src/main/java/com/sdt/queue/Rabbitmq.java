@@ -37,6 +37,7 @@ public class Rabbitmq extends Endpoint implements MessageQueue, com.rabbitmq.cli
 		}
 		return message;
 	}
+	
 
 	public void handleConsumeOk(String consumerTag) {
 		// TODO Auto-generated method stub
