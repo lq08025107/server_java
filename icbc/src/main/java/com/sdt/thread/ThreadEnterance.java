@@ -3,15 +3,16 @@
  */
 package com.sdt.thread;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import javax.swing.plaf.basic.BasicTabbedPaneUI.TabSelectionHandler;
+
 
 import com.sdt.http.HttpServer;
 import com.sdt.logic.LogicModule;
 
-import ch.qos.logback.core.joran.event.StartEvent;
+
 
 /**
  * @author liuqiang
@@ -19,7 +20,7 @@ import ch.qos.logback.core.joran.event.StartEvent;
  */
 public class ThreadEnterance {
 	
-	public void start(){
+	public void start() throws IOException{
 		ExecutorService executor = Executors.newCachedThreadPool();
 		HttpServer httpServer = new HttpServer(8080);
 		//Task task = new Task();
@@ -27,7 +28,7 @@ public class ThreadEnterance {
 		executor.execute(httpServer);
 		executor.execute(logicModule);
 	}
-	public static void main(String[] args){
+	public static void main(String[] args) throws IOException{
 		new ThreadEnterance().start();
 	}
 }

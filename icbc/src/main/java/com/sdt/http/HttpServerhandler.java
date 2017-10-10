@@ -5,6 +5,7 @@ package com.sdt.http;
 
 
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.sdt.logic.LogicModule;
 import com.sdt.queue.LogicQueue;
+import com.sdt.queue.MessageQueue;
+import com.sdt.queue.Rabbitmq;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -58,10 +61,9 @@ public class HttpServerhandler extends ChannelInboundHandlerAdapter {
     private static final String ERROR = "error";
     private static final String CONNECTION_KEEP_ALIVE = "keep-alive";
     private static final String CONNECTION_CLOSE = "close";
-    private Queue<String> processQueue = null;
-    public HttpServerhandler() {
-		LogicQueue logicQueue = new LogicQueue();
-    	processQueue = logicQueue.processQueue;
+    private MessageQueue messageQueue = null;
+    public HttpServerhandler() throws IOException {
+		messageQueue = new Rabbitmq("queue");
 	}
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) {
@@ -135,7 +137,7 @@ public class HttpServerhandler extends ChannelInboundHandlerAdapter {
 		return false;
     }
     
-    private void dealWithContentType() throws UnsupportedEncodingException{
+    private void dealWithContentType() throws UnsupportedEncodingException, InterruptedException{
     	String contentType = getContentType();
     	if(contentType.equals("application/json")){
     		int len = fullRequest.content().readableBytes();  
@@ -145,7 +147,7 @@ public class HttpServerhandler extends ChannelInboundHandlerAdapter {
                 String contentStr = new String(content, "UTF-8");  
                 System.out.println(contentStr);
                 
-                processQueue.offer(contentStr);
+                messageQueue.sendMessage(contentStr);
                 System.out.println("put into queue");
                 //json解析到底在哪里合适
                 JSONObject obj = JSON.parseObject(contentStr);
